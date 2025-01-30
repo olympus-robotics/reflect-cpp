@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.22)
 
 option(REFLECTCPP_BUILD_SHARED "Build shared library" ${BUILD_SHARED_LIBS})
 
@@ -52,7 +52,7 @@ endif()
 
 if (REFLECTCPP_BUILD_TESTS OR REFLECTCPP_BUILD_BENCHMARKS OR
     (REFLECTCPP_JSON AND NOT REFLECTCPP_USE_BUNDLED_DEPENDENCIES) OR REFLECTCPP_AVRO OR
-    REFLECTCPP_BSON OR REFLECTCPP_CAPNPROTO OR REFLECTCPP_CBOR OR REFLECTCPP_FLEXBUFFERS OR 
+    REFLECTCPP_BSON OR REFLECTCPP_CAPNPROTO OR REFLECTCPP_CBOR OR REFLECTCPP_FLEXBUFFERS OR
     REFLECTCPP_MSGPACK OR REFLECTCPP_XML OR REFLECTCPP_TOML OR REFLECTCPP_UBJSON OR REFLECTCPP_YAML)
     # enable vcpkg per default if features other than JSON are required
     set(REFLECTCPP_USE_VCPKG_DEFAULT ON)
@@ -274,22 +274,22 @@ if (PROJECT_IS_TOP_LEVEL)
 
     file(GLOB_RECURSE RFL_HEADERS RELATIVE ${CMAKE_CURRENT_LIST_DIR} "${CMAKE_CURRENT_LIST_DIR}/include/*" )
 
+    # Change "PUBLIC" to "PRIVATE"
     target_sources(reflectcpp
-        PUBLIC
-        FILE_SET reflectcpp_headers
-        TYPE HEADERS
-        BASE_DIRS $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-        FILES ${RFL_HEADERS})
+        PRIVATE
+            ${RFL_HEADERS}
+    )
+
 
     install(
         TARGETS reflectcpp
         EXPORT reflectcpp-exports
-        FILE_SET reflectcpp_headers DESTINATION ${INCLUDE_INSTALL_DIR}
-        )
-
-    install(
-        EXPORT reflectcpp-exports
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/reflectcpp
-        NAMESPACE reflectcpp::
     )
+
+    # Manually install the headers directory
+    install(
+        DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+
 endif ()
