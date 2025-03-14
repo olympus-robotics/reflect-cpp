@@ -286,6 +286,12 @@ if (PROJECT_IS_TOP_LEVEL)
         EXPORT reflectcpp-exports
     )
 
+    install(
+        EXPORT reflectcpp-exports
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/reflectcpp
+        NAMESPACE reflectcpp::
+    )
+
     # Manually install the headers directory
     install(
         DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
