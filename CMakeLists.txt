@@ -61,10 +61,66 @@ endif()
 option(REFLECTCPP_USE_VCPKG "Use VCPKG to download and build dependencies" ${REFLECTCPP_USE_VCPKG_DEFAULT})
 
 if (REFLECTCPP_USE_VCPKG)
+    if (REFLECTCPP_AVRO)
+        list(APPEND VCPKG_MANIFEST_FEATURES "avro")
+    endif()
+    
+    if (REFLECTCPP_BSON)
+        list(APPEND VCPKG_MANIFEST_FEATURES "bson")
+    endif()
+    
+    if (REFLECTCPP_BUILD_BENCHMARKS)
+        list(APPEND VCPKG_MANIFEST_FEATURES "benchmarks")
+    endif()
+
+    if (REFLECTCPP_BUILD_TESTS)
+        list(APPEND VCPKG_MANIFEST_FEATURES "tests")
+    endif()
+    
+    if (REFLECTCPP_CAPNPROTO)
+        list(APPEND VCPKG_MANIFEST_FEATURES "capnproto")
+    endif()
+    
+    if (REFLECTCPP_CBOR)
+        list(APPEND VCPKG_MANIFEST_FEATURES "cbor")
+    endif()
+    
+    if (NOT REFLECTCPP_USE_BUNDLED_DEPENDENCIES)
+        list(APPEND VCPKG_MANIFEST_FEATURES "ctre")
+    endif()
+    
+    if (REFLECTCPP_FLEXBUFFERS)
+        list(APPEND VCPKG_MANIFEST_FEATURES "flexbuffers")
+    endif()
+    
+    if (REFLECTCPP_JSON AND NOT REFLECTCPP_USE_BUNDLED_DEPENDENCIES)
+        list(APPEND VCPKG_MANIFEST_FEATURES "json")
+    endif()
+    
+    if (REFLECTCPP_MSGPACK)
+        list(APPEND VCPKG_MANIFEST_FEATURES "msgpack")
+    endif()
+     
+    if (REFLECTCPP_TOML)
+        list(APPEND VCPKG_MANIFEST_FEATURES "toml")
+    endif()
+    
+    if (REFLECTCPP_UBJSON)
+        list(APPEND VCPKG_MANIFEST_FEATURES "ubjson")
+    endif()
+
+    if (REFLECTCPP_XML)
+        list(APPEND VCPKG_MANIFEST_FEATURES "xml")
+    endif()
+    
+    if (REFLECTCPP_YAML)
+        list(APPEND VCPKG_MANIFEST_FEATURES "yaml")
+    endif()
+    
     set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake CACHE STRING "Vcpkg toolchain file")
 endif ()
 
-project(reflectcpp VERSION 0.17.0 LANGUAGES CXX)
+project(reflectcpp VERSION 0.19.0 LANGUAGES CXX)
 
 if (REFLECTCPP_BUILD_SHARED)
     add_library(reflectcpp SHARED)
@@ -194,16 +250,10 @@ if (REFLECTCPP_TOML)
     list(APPEND REFLECT_CPP_SOURCES
         src/reflectcpp_toml.cpp
     )
-    if(REFLECTCPP_USE_VCPKG)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(tomlplusplus REQUIRED IMPORTED_TARGET tomlplusplus)
-        target_link_libraries(reflectcpp PUBLIC PkgConfig::tomlplusplus)
-    else()
-        if (NOT TARGET tomlplusplus)
-          find_package(tomlplusplus)
-        endif()
-        target_link_libraries(reflectcpp PUBLIC tomlplusplus::tomlplusplus)
+    if (NOT TARGET tomlplusplus)
+      find_package(tomlplusplus)
     endif()
+    target_link_libraries(reflectcpp PUBLIC tomlplusplus::tomlplusplus)
 endif()
 
 if (REFLECTCPP_UBJSON)
@@ -299,3 +349,35 @@ if (PROJECT_IS_TOP_LEVEL)
     )
 
 endif ()
+
+
+# CPack configuration
+
+# Set general package information
+set(CPACK_PACKAGE_NAME "reflectcpp")
+set(CPACK_PACKAGE_VENDOR "Reflect C++ Team")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Reflect C++ library")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_CONTACT "maintainer@reflectcpp.org")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+
+# Configure generators
+set(CPACK_GENERATOR "TGZ;RPM;DEB")
+
+# DEB specific configuration
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+# Fix maintainer information - ensure both are set consistently
+set(CPACK_PACKAGE_CONTACT "maintainer@reflectcpp.org")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "maintainer@reflectcpp.org")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "")
+
+# RPM specific configuration
+set(CPACK_RPM_PACKAGE_REQUIRES "")
+
+include(CPack)
+

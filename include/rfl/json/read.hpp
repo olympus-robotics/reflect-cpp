@@ -31,7 +31,7 @@ auto read(const InputVarType& _obj) {
 /// Parses an object from JSON using reflection.
 template <class T, class... Ps>
 Result<internal::wrap_in_rfl_array_t<T>> read(
-    std::string_view const _json_str, const yyjson_read_flag _flag = 0) {
+    const std::string_view _json_str, const yyjson_read_flag _flag = 0) {
   yyjson_doc* doc = yyjson_read(_json_str.data(), _json_str.size(), _flag);
   if (!doc) {
     return error("Could not parse document");
@@ -45,10 +45,10 @@ Result<internal::wrap_in_rfl_array_t<T>> read(
 
 /// Parses an object from a stringstream.
 template <class T, class... Ps>
-auto read(std::istream& _stream) {
+auto read(std::istream& _stream, const yyjson_read_flag _flag = 0) {
   const auto json_str = std::string(std::istreambuf_iterator<char>(_stream),
                                     std::istreambuf_iterator<char>());
-  return read<T, Ps...>(json_str);
+  return read<T, Ps...>(json_str, _flag);
 }
 
 }  // namespace json
